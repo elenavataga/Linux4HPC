@@ -19,7 +19,7 @@ mkdir -p "$BASE"
 # README.md
 # =============================================================
 cat > "$BASE/README.md" << 'EOF'
-# 07 — Certificate
+# 07 -- Certificate
 =====================================================
 
 ## ____Congratulations!____
@@ -27,33 +27,91 @@ cat > "$BASE/README.md" << 'EOF'
 You have reached the final exercise.
 
 In this directory you have a Bash script.
+You have learned how to run scripts from the command line --
+now try two different ways to run it.
 
-You have learned how to run scripts from the command line,
-so try to run the script and display your certificate.
+-----------------------------------------------------
+## Two ways to run a script
+
+### Way 1 -- tell bash to run it explicitly
 
 ```bash
 bash certificate.sh
 ```
 
-Or, if you want to pass your name directly:
+This always works. You are telling Linux:
+*"use bash to interpret this file"*.
+No special permissions needed.
+
+-----------------------------------------------------
+### Way 2 -- run it like a command
+
+First check the current permissions:
 
 ```bash
-bash certificate.sh "Your Name Here"
+ls -l certificate.sh
 ```
 
-**Well done!**
+You will see something like:
+
+```
+-rw-r--r-- 1 user group 1234 May 14 10:00 certificate.sh
+```
+
+The permission string `-rw-r--r--` means:
+
+| Characters | Who        | Permissions          |
+|------------|------------|----------------------|
+| `-`        | --          | it is a file         |
+| `rw-`      | you        | read and write       |
+| `r--`      | your group | read only            |
+| `r--`      | everyone   | read only            |
+
+Nobody has execute (`x`) permission -- so you cannot run it
+as a command yet.
+
+Add execute permission with `chmod`:
+
+```bash
+chmod +x certificate.sh
+```
+
+Check the permissions again -- notice the `x` has appeared:
+
+```
+-rwxr-xr-x 1 user group 1234 May 14 10:00 certificate.sh
+```
+
+Now run it like a command:
+
+```bash
+./certificate.sh
+```
+
+The `./` means: *run this file from the current directory*.
+
+Or pass your name directly:
+
+```bash
+./certificate.sh "Your Name Here"
+```
+
+-----------------------------------------------------
+
+**Well done -- you have completed the Linux for HPC practical!**
 EOF
 
 # =============================================================
-# certificate.sh
+# certificate.sh -- permissions deliberately NOT executable
+# so students have to chmod +x themselves
 # =============================================================
 cat > "$BASE/certificate.sh" << 'EOF'
 #!/bin/bash
 # certificate.sh
 # Usage:
 #   bash certificate.sh "Ada Lovelace"
-# or:
-#   bash certificate.sh
+# or after chmod +x:
+#   ./certificate.sh "Ada Lovelace"
 
 if [ $# -eq 0 ]; then
     read -r -p "Enter participant name: " NAME
@@ -143,7 +201,31 @@ echo
 echo
 EOF
 
-chmod +x "$BASE/certificate.sh"
+# deliberately NOT chmod +x -- students do this themselves
+# verify it is not executable
+echo "Permissions of certificate.sh (should be -rw-r--r--):"
+ls -l "$BASE/certificate.sh"
+
+# =============================================================
+# .solution
+# =============================================================
+cat > "$BASE/.solution" << 'EOF'
+=====================================================
+SOLUTION -- Certificate
+=====================================================
+
+Way 1 -- run with bash (no permissions needed):
+  bash certificate.sh "Your Name"
+
+Way 2 -- make executable and run as a command:
+  chmod +x certificate.sh
+  ./certificate.sh "Your Name"
+
+chmod +x adds execute permission to the file.
+Without it, ./certificate.sh gives "Permission denied".
+
+=====================================================
+EOF
 
 # =============================================================
 # Verify
@@ -153,4 +235,4 @@ echo "Done. Structure created:"
 echo ""
 find "$BASE" | sort | sed 's|[^/]*/|  |g'
 echo ""
-echo "=== Test run ===" && bash "$BASE/certificate.sh" "Ada Lovelace"
+echo "=== Test run with bash (Way 1) ===" && bash "$BASE/certificate.sh" "Ada Lovelace"
